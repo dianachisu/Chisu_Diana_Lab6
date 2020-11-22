@@ -75,7 +75,7 @@ namespace Chisu_Diana_Lab6
             ((System.Windows.Data.CollectionViewSource)(this.FindResource("inventoryOrdersViewSource")));
             //inventoryOrdersViewSource.Source = ctx.Orders.Local;
             ctx.Orders.Load();
-            ctx.Inventories.Load();
+            
             cmbCustomers.ItemsSource = ctx.Customers.Local;
             //cmbCustomers.DisplayMemberPath = "FirstName";
             cmbCustomers.SelectedValuePath = "CustId";
@@ -352,6 +352,179 @@ namespace Chisu_Diana_Lab6
         inventoryOrdersViewSource.View.MoveCurrentToNext();
     }
 
+        private void btnSave1_Click(object sender, RoutedEventArgs e)
+        {
+            Inventory inventory = null;
+            if (action == ActionState.New)
+            {
+                try
+                {
+                    //instantiem Inventory entity
+                    inventory = new Inventory()
+                    {
+                        Color = colorTextBox.Text.Trim(),
+                        Make = makeTextBox.Text.Trim()
+                    };
+                    //adaugam entitatea nou creata in context
+                    ctx.Inventories.Add(inventory);
+                    inventoryViewSource.View.Refresh();
+                    //salvam modificarile
+                    ctx.SaveChanges();
+                }
+                //using System.Data;
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                action = ActionState.Nothing;
+                btnNew1.IsEnabled = true;
+                btnEdit1.IsEnabled = true;
+                btnDelete1.IsEnabled = true;
+
+                btnSave1.IsEnabled = false;
+                btnCancel1.IsEnabled = false;
+                inventoryDataGrid.IsEnabled = true;
+                btnPrevious1.IsEnabled = true;
+                btnNext1.IsEnabled = true;
+                colorTextBox.IsEnabled = false;
+                makeTextBox.IsEnabled = false;
+            }
+            else
+                if (action == ActionState.Edit)
+            {
+                try
+                {
+                    inventory = (Inventory)inventoryDataGrid.SelectedItem;
+                    inventory.Color = colorTextBox.Text.Trim();
+                    inventory.Make = makeTextBox.Text.Trim();
+                    //salvam modificarile
+                    ctx.SaveChanges();
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                inventoryViewSource.View.Refresh();
+                //pozitionarea pe item-ul curent
+                inventoryViewSource.View.MoveCurrentTo(inventory);
+
+                action = ActionState.Nothing;
+                btnNew1.IsEnabled = true;
+                btnEdit1.IsEnabled = true;
+                btnDelete1.IsEnabled = true;
+
+                btnSave1.IsEnabled = false;
+                btnCancel1.IsEnabled = false;
+                inventoryDataGrid.IsEnabled = true;
+                btnPrevious1.IsEnabled = true;
+                btnNext1.IsEnabled = true;
+                colorTextBox.IsEnabled = false;
+                makeTextBox.IsEnabled = false;
+            }
+            else
+                if (action == ActionState.Delete)
+            {
+                try
+                {
+                    inventory = (Inventory)inventoryDataGrid.SelectedItem;
+                    ctx.Inventories.Remove(inventory);
+                    ctx.SaveChanges();
+                }
+                catch (DataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                inventoryViewSource.View.Refresh();
+
+                action = ActionState.Nothing;
+                btnNew1.IsEnabled = true;
+                btnEdit1.IsEnabled = true;
+                btnDelete1.IsEnabled = true;
+
+                btnSave1.IsEnabled = false;
+                btnCancel1.IsEnabled = false;
+                inventoryDataGrid.IsEnabled = true;
+                btnPrevious1.IsEnabled = true;
+                btnNext1.IsEnabled = true;
+                colorTextBox.IsEnabled = false;
+                makeTextBox.IsEnabled = false;
+            }
+            SetValidationBinding();
+        }
+        private void btnNew1_Click(object sender, RoutedEventArgs e)
+        {
+            action = ActionState.New;
+            btnNew1.IsEnabled = false;
+            btnEdit1.IsEnabled = false;
+            btnDelete1.IsEnabled = false;
+
+            btnSave1.IsEnabled = true;
+            btnCancel1.IsEnabled = true;
+            btnPrevious1.IsEnabled = false;
+            btnNext1.IsEnabled = false;
+            colorTextBox.IsEnabled = true;
+            makeTextBox.IsEnabled = true;
+            BindingOperations.ClearBinding(colorTextBox, TextBox.TextProperty);
+            BindingOperations.ClearBinding(makeTextBox, TextBox.TextProperty);
+            colorTextBox.Text = "";
+            makeTextBox.Text = "";
+            Keyboard.Focus(colorTextBox);
+        }
+        private void btnEdit1_Click(object sender, RoutedEventArgs e)
+        {
+            action = ActionState.Edit;
+            string colorString = colorTextBox.Text.ToString();
+            string makeString = makeTextBox.Text.ToString();
+            btnNew1.IsEnabled = false;
+            btnEdit1.IsEnabled = false;
+            btnDelete1.IsEnabled = false;
+
+            btnSave1.IsEnabled = true;
+            btnCancel1.IsEnabled = true;
+            inventoryDataGrid.IsEnabled = false;
+            btnPrevious1.IsEnabled = false;
+            btnNext1.IsEnabled = false;
+            colorTextBox.IsEnabled = true;
+            makeTextBox.IsEnabled = true;
+
+            colorTextBox.Text = colorString;
+            makeTextBox.Text = makeString;
+            Keyboard.Focus(colorTextBox);
+        }
+        private void btnDelete1_Click(object sender, RoutedEventArgs e)
+        {
+            action = ActionState.Delete;
+            string colorString = colorTextBox.Text.ToString();
+            string makeString = makeTextBox.Text.ToString();
+            btnNew1.IsEnabled = false;
+            btnEdit1.IsEnabled = false;
+            btnDelete1.IsEnabled = false;
+
+            btnSave1.IsEnabled = true;
+            btnCancel1.IsEnabled = true;
+            inventoryDataGrid.IsEnabled = false;
+            btnPrevious1.IsEnabled = false;
+            btnNext1.IsEnabled = false;
+
+            colorTextBox.Text = colorString;
+            makeTextBox.Text = makeString;
+        }
+        private void btnCancel1_Click(object sender, RoutedEventArgs e)
+        {
+
+            action = ActionState.Nothing;
+            btnNew1.IsEnabled = true;
+            btnEdit1.IsEnabled = true;
+            btnDelete1.IsEnabled = true;
+
+            btnSave1.IsEnabled = false;
+            btnCancel1.IsEnabled = false;
+            inventoryDataGrid.IsEnabled = true;
+            btnPrevious1.IsEnabled = true;
+            btnNext1.IsEnabled = true;
+            colorTextBox.IsEnabled = false;
+            makeTextBox.IsEnabled = false;
+        }
 
         private void btnSaveO_Click(object sender, RoutedEventArgs e)
         {
